@@ -28,6 +28,9 @@ class ElementDataList:
         element = self.data_list[index]
         self.data_list = ElementDataList(self.data_list[:index] + self.data_list[index + 1:]).data_list
         return[element]
+    
+    def __add__(self, other):
+        return ElementDataList(self.data_list + other.data_list)
         
     def __repr__(self):
         return f"data_list = {self.data_list}"
@@ -67,6 +70,11 @@ class ElementDataMap:
         for key in other_dict:
             self.data_map[key] = other_dict[key]
     
+    def __add__(self, other):
+        new_dict = self.data_map.copy()
+        for key in other.data_map:
+            new_dict[key] = other.data_map[key]
+        return ElementDataMap(new_dict)
         
     def __repr__(self):
         return f"data_map = {self.data_map}"
@@ -76,6 +84,11 @@ class Element:
         if not isinstance(value, int):
             raise ValueError("The value must be int")
         self.__value = value
+        
+        if isinstance(data_list, ElementDataList):
+            data_list = data_list.data_list
+        if isinstance(data_map, ElementDataMap):
+            data_map = data_map.data_map
         
         self.__data_list = ElementDataList(data_list)
         self.__data_map = ElementDataMap(data_map)
@@ -120,6 +133,22 @@ class Element:
     @data_map.deleter
     def data_map(self):
         del self.__data_map
+        
+    def __add__(self, other):
+        if isinstance(other, Element):
+            new_data_list = self.data_list + other.data_list
+            new_data_map = self.data_map + other.data_map
+            return Element(self.value + other.value, data_list=new_data_list, data_map=new_data_map)
+        if isinstance(other, int):
+            return Element(self.value + other, data_list=self.data_list, data_map=self.data_map)
+    
+    def __radd__(self, other):
+        if isinstance(other, Element):
+            new_data_list = other.data_list + self.data_list
+            new_data_map = other.data_map + self.data_map
+            return Element(self.value + other.value, data_list=new_data_list, data_map=new_data_map)
+        if isinstance(other, int):
+            return Element(self.value + other, data_list=self.data_list, data_map=self.data_map)
     
     
     def __repr__(self):
@@ -128,11 +157,10 @@ class Element:
 
         
 a = Element(5, data_list=[1, 2, 3], data_map={"lol": 1, "lololo": 2, "lolo": 3})
-print(a)
-print(a.data_map.get("lol"))
-print(a.data_map.get("lololoololo"))
-print(a.data_map.items())
-print(a.data_map.values())
-a.data_list.pop()
-a.data_map.update({"lol": 4, "lolol": 5})
-print(a)
+b = Element(4,  data_list=[4, 5, 6], data_map={"fdf": 1, "dfdfdf": 2, "dfdf": 3})
+print(a + 4)
+print(4 + a)
+c = a + b
+print(c)
+d = b + a
+print(d)
