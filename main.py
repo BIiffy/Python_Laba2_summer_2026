@@ -1,10 +1,13 @@
 class ElementDataList:
     def __init__(self, data_list = None):
         self.data_list = data_list if data_list != None else []
-        if not isinstance(self.data_list, list):
-            raise ValueError("The data_list must be list")
-        if any(not isinstance(i, int) for i in self.data_list):
-            raise ValueError("The elements in data_list must be of type int")
+        self.__checkListValues(self.data_list)
+        
+    def __checkListValues(self, my_list):
+        if not isinstance(my_list, list):
+            raise ValueError("The object must be type list")
+        if any(not isinstance(i, int) for i in my_list):
+            raise ValueError("The elements in list must be of type int")
         
     def get(self, index = None):
         index = len(self.data_list) - 1 if index is None else index
@@ -15,7 +18,8 @@ class ElementDataList:
         return self.data_list[index]
     
     def append(self, value):
-        self.data_list = ElementDataList(self.data_list + [value]).data_list
+        new_list = self.data_list + [value]
+        self.data_list = ElementDataList(new_list).data_list
         
     def pop(self, index = None):
         index = len(self.data_list) - 1 if index is None else index
@@ -31,17 +35,38 @@ class ElementDataList:
 class ElementDataMap:
     def __init__(self, data_map = None):
         self.data_map = data_map if data_map != None else {}
-        if not isinstance(self.data_map, dict):
-            raise ValueError("The data_map must be dict")
-        if any(not isinstance(i, str) or not isinstance(self.data_map[i], int) for i in self.data_map):
-            raise ValueError("The keys in data_map must be of type str and the elements in data_map must be of type int")
-        
+        self.__checkDictValues(self.data_map)
+       
+    def __checkDictValues(self, my_dict):
+         if not isinstance(my_dict, dict):
+            raise ValueError("The object must be dict")
+         if any(not isinstance(i, str) or not isinstance(my_dict[i], int) for i in my_dict):
+            raise ValueError("The keys in dict must be of type str and the elements in dict must be of type int")
+    
     def get(self, key):
         if not isinstance(key, str):
             raise ValueError("Incorrect key value")
         if key not in self.data_map:
             return None
         return self.data_map[key]
+    
+    def items(self):
+        list_of_items = []
+        for key in self.data_map:
+            list_of_items.append((key, self.data_map[key]))
+        return list_of_items
+    
+    def values(self):
+        list_of_items = []
+        for key in self.data_map:
+            list_of_items.append(self.data_map[key])
+        return list_of_items
+    
+    def update(self, other_dict):
+        self.__checkDictValues(other_dict)
+        for key in other_dict:
+            self.data_map[key] = other_dict[key]
+    
         
     def __repr__(self):
         return f"data_map = {self.data_map}"
@@ -102,13 +127,12 @@ class Element:
 
 
         
-a = Element(5)
+a = Element(5, data_list=[1, 2, 3], data_map={"lol": 1, "lololo": 2, "lolo": 3})
 print(a)
-print(a.value)
-a.value = 3
-a.data_list = [0, 1, 2, 3, 4, 5, 6]
-print(a)
-a.data_list.append(7)
-print(a)
+print(a.data_map.get("lol"))
+print(a.data_map.get("lololoololo"))
+print(a.data_map.items())
+print(a.data_map.values())
 a.data_list.pop()
+a.data_map.update({"lol": 4, "lolol": 5})
 print(a)
